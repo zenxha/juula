@@ -42,41 +42,33 @@ const Home = () => {
 
     <Box bg="teal.300" height="100vh" width="100vw">
     <Flex margin="20px" bg="teal.500" height="100%">  
-    <Grid
-      flex={1}
-      templateRows="repeat(8, 1fr)" // First row 1/8 height, second row 7/8 height
-      templateColumns="1fr 1fr" // Two columns, each 1/2 width
-      gap={4}
-      h="100vh"
-      w="100%"
-      overflow={"hidden"}
-    >
+    <div className="flex flex-1 flex-col h-full w-full overflow-hidden">
+      {/* Top section */}
+      <div className="flex flex-row h-1/8 w-full gap-4">
       {/* Top-left box (1/2 width, 1/8 height) */}
-      <GridItem rowSpan={1} colSpan={1}>
-        <Box h="100%" w="100%" display="flex" alignItems="center" justifyContent="flex-start">
-         <Title></Title>
-        </Box>
-      </GridItem>
-
+        <div className="flex items-center justify-start w-3/5">
+          <Title />
+        </div>
       {/* Top-right box (1/2 width, 1/8 height) */}
-      <GridItem rowSpan={4} colSpan={1}>
-        <Box bg="red.300" h="100%" w="100%">
-          Top Right (1/2 width, 1/8 height)
-        </Box>
-      </GridItem>
+        <div className="flex bg-red-300 w-2/5">
+          {/* Top Right (1/2 width, 1/8 height) */}
+        </div>
+      </div>
 
+      {/* Bottom section */}
+      <div className="flex flex-row h-7/8 w-full gap-2">
       {/* Bottom-left box (1/2 width, 7/8 height) */}
-      <GridItem rowSpan={7} colSpan={1}>
-          <Player></Player>
-      </GridItem>
-
+        <div className="w-3/5 bg-white">
+        
+          <Player />
+          
+        </div>
       {/* Bottom-right box (1/2 width, 7/8 height) */}
-      <GridItem rowSpan={4} colSpan={1}>
-        <Box bg="yellow.300" h="100%" w="100%">
+        <div className="bg-yellow-300 w-2/5">
           {/* <Player /> */}
-        </Box>
-      </GridItem>
-    </Grid>
+        </div>
+      </div>
+    </div>
       {/* <Box position="fixed" bottom="0px" right="10px">
         <Image src="https://catbox.moe/pictures/qts/1486346829409.png" alt="Cute Image" width={100} height={100} />
       </Box> */}

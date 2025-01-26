@@ -26,21 +26,26 @@ const Player = () => {
     // Fallback for browsers that don't support HLS.js
     
     return (
-      <div className = "w-1/2 h-screen bg-green-300"> 
-        <div className="aspect-w-16 aspect-h-9 w-full h-full border">
+      <div className = "w-full h-screen bg-green-300"> 
+        <AspectRatio ratio={16 / 9} w="100%">
           <video ref={videoRef} controls className="object-contain w-full h-auto rounded-md" />
-        </div>
+        </AspectRatio>
+        <div className="flex justify-center items-center">
         <HStack overflowX="scroll" gap={4} mt={4}>
           {channels.map((channel) => (
             <Button
               key={channel.name}
               onClick={() => setSelectedChannel(channel)}
+              display="flex"
+              background={selectedChannel.name === channel.name ? "gray.300" : "teal.500"}
             >
               <Image src={channel.logo} alt={channel.name} boxSize="20px" />
               {channel.name}
             </Button>
           ))}
         </HStack>
+        </div>
+       
       </div>
   );
 };
