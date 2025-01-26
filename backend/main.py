@@ -44,7 +44,7 @@ def start_ffmpeg_pipe(url):
     return subprocess.Popen(
         ffmpeg_command,
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,  # Capture errors
         bufsize=10**6,
     )
 
@@ -60,32 +60,40 @@ async def stream_to_google_speech(websocket: WebSocket, ffmpeg_proc, language_co
     )
     streaming_config = speech.StreamingRecognitionConfig(config=config, interim_results=True)
 
-    def generate_audio_chunks():
+    # The function should take ffmpeg_proc as an argument
+    def generate_audio_chunks(ffmpeg_proc):
         """Generator that yields audio chunks from FFmpeg."""
-        print("Generating audio chunks")
+        bytes_read = 0
         while True:
             chunk = ffmpeg_proc.stdout.read(4096)  # Read 4KB chunks
             if not chunk:
+                error_message = ffmpeg_proc.stderr.read().decode()
+                print(f"No more audio data from FFmpeg. Errors: {error_message}")
                 break
+            bytes_read += len(chunk)
+            print(f"Read chunk: {len(chunk)} bytes, Total bytes: {bytes_read}")
             yield chunk
 
+    # Create requests from the chunks
     requests = (
         speech.StreamingRecognizeRequest(audio_content=chunk)
-        for chunk in generate_audio_chunks()
+        for chunk in generate_audio_chunks(ffmpeg_proc)  # Pass ffmpeg_proc here
     )
-    print("Streaming audio to Google Speech-to-Text")
-    responses = client.streaming_recognize(config=streaming_config, requests=requests)
-    print("Receiving transcription responses")
-    print(responses)
 
     try:
+        responses = client.streaming_recognize(config=streaming_config, requests=requests)
+
         async for response in responses:
             for result in response.results:
                 if result.alternatives:
                     transcription = result.alternatives[0].transcript
+                    print(f"Transcription: {transcription}")
                     await websocket.send_text(transcription)
+
     except Exception as e:
-        print(f"Error in streaming: {e}")
+        print(f"Error during streaming: {e}")
+    finally:
+        ffmpeg_proc.terminate()
 
 
 @app.websocket("/ws/transcribe/{stream_name}")
@@ -104,5 +112,7 @@ async def websocket_transcribe(websocket: WebSocket, stream_name: str):
         await stream_to_google_speech(websocket, ffmpeg_proc)
     except WebSocketDisconnect:
         print(f"Client disconnected from {stream_name}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
     finally:
         ffmpeg_proc.terminate()
