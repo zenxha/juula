@@ -11,7 +11,7 @@ const Home = () => {
     const videoElement = videoRef.current;
     if (videoElement && Hls.isSupported()) {
       const hls = new Hls();
-      hls.loadSource('http://vthanh.utako.moe/Tokyo_MX1/index.m3u8'); // Replace with your m3u8 stream URL
+      hls.loadSource('http://luong.utako.moe/spaceshower/index.m3u8'); // Replace with your m3u8 stream URL
       hls.attachMedia(videoElement);
 
       return () => {
@@ -21,7 +21,7 @@ const Home = () => {
 
     // Fallback for browsers that don't support HLS.js
     if (videoElement && videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-      videoElement.src = 'Http://vthanh.utako.moe/TBS/index.m3u8'; // Fallback method for native HLS support (e.g., Safari)
+      videoElement.src = 'ttp://luong.utako.moe/pigoo/index.m3u8'; // Fallback method for native HLS support (e.g., Safari)
     }
   }, []);
 
