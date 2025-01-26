@@ -66,7 +66,7 @@ def cleanup_streams():
         stop_ffmpeg_process(name)
 
 async def stream_to_google_speech(websocket: WebSocket, ffmpeg_proc, stream_name, language_code="ja-JP"):
-    """Streams audio from FFmpeg to Google Cloud Speech-to-Text and sends transcriptions."""
+    """Streams audio from FFmpeg to Google Cloud Speech-to-Text and sends transcriptions to all clients."""
     client = speech.SpeechClient()
 
     config = speech.RecognitionConfig(
@@ -101,14 +101,19 @@ async def stream_to_google_speech(websocket: WebSocket, ffmpeg_proc, stream_name
             for result in response.results:
                 if result.alternatives:
                     transcription = result.alternatives[0].transcript
-                    await websocket.send_text(transcription)
+                    # Broadcast to all clients connected to this stream
+                    for client in active_clients[stream_name]:
+                        try:
+                            await client.send_text(transcription)
+                        except Exception as e:
+                            print(f"Error sending message to client: {e}")
 
     except Exception as e:
         print(f"Error during streaming: {e}")
     finally:
-        # When all clients disconnect, stop the FFmpeg process
+        # Remove the client from the active list
         active_clients[stream_name].remove(websocket)
-        if not active_clients[stream_name]:
+        if not active_clients[stream_name]:  # If no clients left, stop the FFmpeg process
             stop_ffmpeg_process(stream_name)
 
 @app.websocket("/ws/transcribe/{stream_name}")
