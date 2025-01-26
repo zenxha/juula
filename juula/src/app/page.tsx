@@ -4,7 +4,7 @@ import { Box, Flex, Text, Button, VStack} from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
 import Image from 'next/image';
-import '@vidstack/react/player/styles/base.css';
+// import '@vidstack/react/player/styles/base.css';
 // import { MediaPlayer, MediaProvider } from '@vidstack/react';
 // // import { PlayIcon } from '@vidstack/react/icons';
 // import {
