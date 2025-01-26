@@ -24,7 +24,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
   return (
     <html suppressHydrationWarning>
-      <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+      <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
       <body>
         <Provider>{children}</Provider>
       </body>
