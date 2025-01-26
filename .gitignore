@@ -1,6 +1,6 @@
 # Node.js
-/frontend/node_modules/
-/frontend/.next/
+/juula/node_modules/
+/juula/.next/
 
 # Python
 /backend/venv/
@@ -10,3 +10,6 @@
 # General
 .DS_Store
 *.log
+
+package-lock.json
+.gitignore

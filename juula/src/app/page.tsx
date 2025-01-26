@@ -1,9 +1,13 @@
 'use client';
 
-import { Box, Flex, Text, Button, VStack} from "@chakra-ui/react";
+import { Box, Grid, GridItem,  Flex, Text, Button, VStack, ChakraProvider } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
 import Image from 'next/image';
+import Title from "@/components/title";
+import Player from "@/components/player";
+import {Global} from "@emotion/react";
+import { Play } from "next/font/google";
 // import '@vidstack/react/player/styles/base.css';
 // import { MediaPlayer, MediaProvider } from '@vidstack/react';
 // // import { PlayIcon } from '@vidstack/react/icons';
@@ -12,8 +16,6 @@ import Image from 'next/image';
 //     defaultLayoutIcons,
 //     DefaultVideoLayout,
 //   } from '@vidstack/react/player/layouts/default';
-
-
 
 const Home = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -37,104 +39,48 @@ const Home = () => {
   }, []);
 
   return (
-    <Box w="100%" minH="100vh" bg="gray.100" color="gray.900">
-      <Flex justify="center" align="center" flexDirection="column" py={8}>
-        <Text fontSize="3xl" mb={4} fontWeight="bold">
-          Welcome to Juula - Live Japanese TV Streaming
-        </Text>
-        <Text fontSize="lg" mb={6} textAlign="center">
-          Enjoy live Japanese television shows with interactive features for language learning and comprehension!
-        </Text>
-      </Flex>
 
-      <Flex justify="center" gap={6} px={4}>
-        {/* Video Section */}
-        <Box
-          bg="black"
-          w="70%"
-          maxW="800px"
-          borderRadius="lg"
-          overflow="hidden"
-          boxShadow="lg"
-        >
-        {/* <MediaPlayer autoPlay={true} title="Stream" src="http://luong.utako.moe/spaceshower/index.m3u8">
-        <PlayIcon size={40} />
-        <MediaProvider />
-        </MediaPlayer> */}
-        {/* <MediaPlayer title="Lol" src="http://luong.utako.moe/spaceshower/index.m3u8">
-            <MediaProvider />
-            <DefaultAudioLayout icons={defaultLayoutIcons} />
-            <DefaultVideoLayout icons={defaultLayoutIcons} />
-        </MediaPlayer>} */}
-        <video ref={videoRef} controls width="100%" style={{ display: "block" }}>
-            Your browser does not support the video tag.
-        </video>
+    <Box bg="teal.300" height="100vh" width="100vw">
+    <Flex margin="20px" bg="teal.500" height="100%">  
+    <Grid
+      flex={1}
+      templateRows="repeat(8, 1fr)" // First row 1/8 height, second row 7/8 height
+      templateColumns="1fr 1fr" // Two columns, each 1/2 width
+      gap={4}
+      h="100vh"
+      w="100%"
+      overflow={"hidden"}
+    >
+      {/* Top-left box (1/2 width, 1/8 height) */}
+      <GridItem rowSpan={1} colSpan={1}>
+        <Box h="100%" w="100%" display="flex" alignItems="center" justifyContent="flex-start">
+         <Title></Title>
         </Box>
+      </GridItem>
 
+      {/* Top-right box (1/2 width, 1/8 height) */}
+      <GridItem rowSpan={4} colSpan={1}>
+        <Box bg="red.300" h="100%" w="100%">
+          Top Right (1/2 width, 1/8 height)
+        </Box>
+      </GridItem>
 
-        {/* Info Section */}
-        <VStack
-          bg="white"
-          w="30%"
-          maxW="400px"
-          p={4}
-          borderRadius="lg"
-          boxShadow="md"
+      {/* Bottom-left box (1/2 width, 7/8 height) */}
+      <GridItem rowSpan={7} colSpan={1}>
+          <Player></Player>
+      </GridItem>
 
-          align="stretch"
-        >
-          {/* Summary Section */}
-          <Box>
-            <Text fontSize="xl" fontWeight="bold" mb={2}>
-              Summary
-            </Text>
-            <Text fontSize="sm" color="gray.700">
-              • Leaves are Green (葉っぱ): The vibrant green leaves that blanket the countryside are the symbol of Japan’s natural beauty, signifying renewal and harmony.
-            </Text>
-            <Text fontSize="sm" color="gray.700" mt={2}>
-              • The Cherry Blossom Leaves (桜の葉): After the iconic cherry blossoms bloom, the leaves create a serene landscape evoking peace and nostalgia.
-            </Text>
-          </Box>
-
-          {/* Transcript Section */}
-          <Box>
-            <Text fontSize="xl" fontWeight="bold" mb={2}>
-              Transcript
-            </Text>
-            <Text fontSize="sm" color="gray.700">
-              Live transcription will appear here.
-            </Text>
-            <Button mt={2} size="sm" colorScheme="blue">
-              Live Transcript
-            </Button>
-          </Box>
-
-          {/* Translate Section */}
-          <Box>
-            <Text fontSize="xl" fontWeight="bold" mb={2}>
-              Translate
-            </Text>
-            <Button colorScheme="teal" size="sm">
-              Translation
-            </Button>
-          </Box>
-
-          {/* Keywords Section */}
-          <Box>
-            <Text fontSize="xl" fontWeight="bold" mb={2}>
-              Keywords
-            </Text>
-            <Text fontSize="sm" color="gray.700">
-              Highlighted keywords will appear here.
-            </Text>
-          </Box>
-        </VStack>
-      </Flex>
-
-      {/* Footer */}
-    <Box position="fixed" bottom="0px" right="10px">
-      <Image src="https://catbox.moe/pictures/qts/1486346829409.png" alt="Cute Image" width={100} height={100} />
-    </Box>
+      {/* Bottom-right box (1/2 width, 7/8 height) */}
+      <GridItem rowSpan={4} colSpan={1}>
+        <Box bg="yellow.300" h="100%" w="100%">
+          {/* <Player /> */}
+        </Box>
+      </GridItem>
+    </Grid>
+      {/* <Box position="fixed" bottom="0px" right="10px">
+        <Image src="https://catbox.moe/pictures/qts/1486346829409.png" alt="Cute Image" width={100} height={100} />
+      </Box> */}
+    </Flex>
     </Box>
   );
 };
