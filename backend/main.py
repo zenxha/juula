@@ -1,10 +1,9 @@
-import subprocess
-# from openai import OpenAI
-
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
-import threading
+import asyncio
 import os
+import threading
+import subprocess
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from google.cloud import speech
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,7 +11,6 @@ load_dotenv()
 # client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 app = FastAPI()
 
-# Replace with your OpenAI API Key
 
 
 STREAMS = {
@@ -33,70 +31,78 @@ STREAMS = {
 
 ffmpeg_processes = {}
 
-def start_ffmpeg_process(name, url, output_file):
-    """Starts an FFmpeg process for a given stream."""
+def start_ffmpeg_pipe(url):
+    """Starts an FFmpeg process and pipes audio data."""
     ffmpeg_command = [
         "ffmpeg",
         "-i", url,
         "-vn",  # Disable video
-        "-acodec", "pcm_s16le",
-        "-ar", "16000",
-        "-ac", "1",
-        output_file,
+        "-f", "flac",  # Google Speech-to-Text prefers FLAC
+        "pipe:1",
     ]
-    # Run FFmpeg in a subprocess
-    process = subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ffmpeg_processes[name] = process
+    print(f"Running FFmpeg command: {' '.join(ffmpeg_command)}")
+    return subprocess.Popen(
+        ffmpeg_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        bufsize=10**6,
+    )
 
-def stop_ffmpeg_process(name):
-    """Stops an FFmpeg process for a given stream."""
-    process = ffmpeg_processes.pop(name, None)
-    if process:
-        process.terminate()
 
-@app.on_event("shutdown")
-def cleanup_streams():
-    """Stops all FFmpeg processes on shutdown."""
-    for name in list(ffmpeg_processes.keys()):
-        stop_ffmpeg_process(name)
+async def stream_to_google_speech(websocket: WebSocket, ffmpeg_proc, language_code="ja-JP"):
+    """Streams audio from FFmpeg to Google Cloud Speech-to-Text and sends transcriptions."""
+    client = speech.SpeechClient()
 
-@app.get("/streams")
-def get_streams():
-    """Returns a list of available streams."""
-    return list(STREAMS.keys())
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.FLAC,
+        sample_rate_hertz=16000,
+        language_code=language_code,
+    )
+    streaming_config = speech.StreamingRecognitionConfig(config=config, interim_results=True)
+
+    def generate_audio_chunks():
+        """Generator that yields audio chunks from FFmpeg."""
+        print("Generating audio chunks")
+        while True:
+            chunk = ffmpeg_proc.stdout.read(4096)  # Read 4KB chunks
+            if not chunk:
+                break
+            yield chunk
+
+    requests = (
+        speech.StreamingRecognizeRequest(audio_content=chunk)
+        for chunk in generate_audio_chunks()
+    )
+    print("Streaming audio to Google Speech-to-Text")
+    responses = client.streaming_recognize(config=streaming_config, requests=requests)
+    print("Receiving transcription responses")
+    print(responses)
+
+    try:
+        async for response in responses:
+            for result in response.results:
+                if result.alternatives:
+                    transcription = result.alternatives[0].transcript
+                    await websocket.send_text(transcription)
+    except Exception as e:
+        print(f"Error in streaming: {e}")
+
 
 @app.websocket("/ws/transcribe/{stream_name}")
 async def websocket_transcribe(websocket: WebSocket, stream_name: str):
-    print(f"Client connected to {stream_name}")
     if stream_name not in STREAMS:
-        print(f"Stream {stream_name} not found")
         await websocket.close(code=1003)
         raise HTTPException(status_code=404, detail="Stream not found")
 
-    audio_file = f"{stream_name}.wav"
-
-    # Start FFmpeg process if not already running
-    if stream_name not in ffmpeg_processes:
-        print(f"Starting FFmpeg process for {stream_name}")
-        threading.Thread(
-            target=start_ffmpeg_process,
-            args=(stream_name, STREAMS[stream_name], audio_file),
-            daemon=True,
-        ).start()
-
-    # Accept the WebSocket connection
     await websocket.accept()
-    print(f"Established WebSocket connection")
+
+    url = STREAMS[stream_name]
+    print(f"Pulling audio from stream: {url}")
+    ffmpeg_proc = start_ffmpeg_pipe(url)
+
     try:
-        while True:
-            # Transcribe audio and send real-time updates to the frontend
-            try:
-                with open(audio_file, "rb") as audio:
-                    response = client.audio.transcribe("whisper-1", audio)
-                    await websocket.send_json({"transcription": response.text})
-            except FileNotFoundError:
-                await websocket.send_json({"error": "Audio file not ready yet"})
-            except Exception as e:
-                await websocket.send_json({"error": str(e)})
+        await stream_to_google_speech(websocket, ffmpeg_proc)
     except WebSocketDisconnect:
         print(f"Client disconnected from {stream_name}")
+    finally:
+        ffmpeg_proc.terminate()
