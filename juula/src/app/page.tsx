@@ -4,6 +4,16 @@ import { Box, Flex, Text, Button, VStack} from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
 import Image from 'next/image';
+import '@vidstack/react/player/styles/base.css';
+// import { MediaPlayer, MediaProvider } from '@vidstack/react';
+// // import { PlayIcon } from '@vidstack/react/icons';
+// import {
+//     DefaultAudioLayout,
+//     defaultLayoutIcons,
+//     DefaultVideoLayout,
+//   } from '@vidstack/react/player/layouts/default';
+
+
 
 const Home = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -47,10 +57,20 @@ const Home = () => {
           overflow="hidden"
           boxShadow="lg"
         >
-          <video ref={videoRef} controls width="100%" style={{ display: "block" }}>
+        {/* <MediaPlayer autoPlay={true} title="Stream" src="http://luong.utako.moe/spaceshower/index.m3u8">
+        <PlayIcon size={40} />
+        <MediaProvider />
+        </MediaPlayer> */}
+        {/* <MediaPlayer title="Lol" src="http://luong.utako.moe/spaceshower/index.m3u8">
+            <MediaProvider />
+            <DefaultAudioLayout icons={defaultLayoutIcons} />
+            <DefaultVideoLayout icons={defaultLayoutIcons} />
+        </MediaPlayer>} */}
+        <video ref={videoRef} controls width="100%" style={{ display: "block" }}>
             Your browser does not support the video tag.
-          </video>
+        </video>
         </Box>
+
 
         {/* Info Section */}
         <VStack
