@@ -3,6 +3,7 @@
 import { Box, Flex, Text, Button, VStack} from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
+import Image from 'next/image';
 
 const Home = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -111,9 +112,9 @@ const Home = () => {
       </Flex>
 
       {/* Footer */}
-      <Box position="fixed" bottom="10px" right="10px" boxSize="100px">
-        <img src="https://catbox.moe/pictures/qts/1486346829409.png" alt="Cute Image" />
-      </Box>
+    <Box position="fixed" bottom="0px" right="10px">
+      <Image src="https://catbox.moe/pictures/qts/1486346829409.png" alt="Cute Image" width={100} height={100} />
+    </Box>
     </Box>
   );
 };
