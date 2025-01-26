@@ -1,9 +1,14 @@
 'use client';
 
-import { Box, Flex, Text, Button, VStack} from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { Box, Stack, For, Flex, Text, Button, VStack, ListCollection} from "@chakra-ui/react";
+import {
+  NativeSelectField,
+  NativeSelectRoot,
+} from "@/components/ui/native-select"
+import { useState, useEffect, useRef } from "react";
 import Hls from "hls.js";
 import Image from 'next/image';
+import { channels } from "../data/channels"  
 // import '@vidstack/react/player/styles/base.css';
 // import { MediaPlayer, MediaProvider } from '@vidstack/react';
 // // import { PlayIcon } from '@vidstack/react/icons';
@@ -13,16 +18,31 @@ import Image from 'next/image';
 //     DefaultVideoLayout,
 //   } from '@vidstack/react/player/layouts/default';
 
+// const PageColors = {
+//   "light": {
+//     text: "black",
+//     background: "white",
+//   },
+//   "dark": {
+//     text: "white",
+//     background: "#1a202c",
+//   },
+// };
+
 
 
 const Home = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
+  // const colors = PageColors[theme];
+  const [selectedChannel, setSelectedChannel] = useState("http://luong.utako.moe/spaceshower/index.m3u8");
   useEffect(() => {
     const videoElement = videoRef.current;
     if (videoElement && Hls.isSupported()) {
       const hls = new Hls();
-      hls.loadSource('https://luong.utako.moe/spaceshower/index.m3u8'); // Replace with your m3u8 stream URL
+      // setSelectedChannel("http://vthanh.utako.moe/NHK_G/index.m3u8");
+      // hls.loadSource("http://luong.utako.moe/spaceshower/index.m3u8"); // Replace with your m3u8 stream URL
+      // hls.loadSource("http://vthanh.utako.moe/NHK_G/index.m3u8");
+      hls.loadSource(selectedChannel);
       hls.attachMedia(videoElement);
 
       return () => {
@@ -34,7 +54,7 @@ const Home = () => {
     if (videoElement && videoElement.canPlayType('application/vnd.apple.mpegurl')) {
       videoElement.src = 'http://vthanh.utako.moe/TBS/index.m3u8'; // Fallback method for native HLS support (e.g., Safari)
     }
-  }, []);
+  }, [selectedChannel]);
 
   return (
     <Box w="100%" minH="100vh" bg="gray.100" color="gray.900">
@@ -83,6 +103,19 @@ const Home = () => {
 
           align="stretch"
         >
+
+          <Box>  
+            <NativeSelectRoot size="md" width="240px" variant="plain" colorPalette="accent">
+              <NativeSelectField
+                style={{ background: "white", color: "black" }}
+                placeholder="Select channel"
+                items={channels}
+                onChange={(e) =>{setSelectedChannel(e.currentTarget.value);
+                  console.log(selectedChannel);}}
+              />
+            </NativeSelectRoot>
+          </Box>
+
           {/* Summary Section */}
           <Box>
             <Text fontSize="xl" fontWeight="bold" mb={2}>
