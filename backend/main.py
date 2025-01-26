@@ -39,6 +39,9 @@ def start_ffmpeg_pipe(url):
         "-i", url,
         "-vn",  # Disable video
         "-f", "flac",  # Google Speech-to-Text prefers FLAC
+        "-ar", "16000",  # Resample to 16 kHz
+        "-ac", "1",  # Mono audio
+
         "pipe:1",
     ]
     print(f"Running FFmpeg command: {' '.join(ffmpeg_command)}")
@@ -76,9 +79,15 @@ async def stream_to_google_speech(websocket: WebSocket, ffmpeg_proc, stream_name
     def generate_audio_chunks():
         """Generator that yields audio chunks from FFmpeg."""
         while True:
+            print("Reading audio chunk from FFmpeg")
             chunk = ffmpeg_proc.stdout.read(4096)  # Read 4KB chunks
+            print(f"Read chunk: {len(chunk)} bytes")
             if not chunk:
+                print(f"No more audio data from FFmpeg. Errors: {error_message}")
+
                 break
+            bytes_read += len(chunk)
+            print(f"Read chunk: {len(chunk)} bytes, Total bytes: {bytes_read}")
             yield chunk
 
     try:
@@ -119,6 +128,7 @@ async def websocket_transcribe(websocket: WebSocket, stream_name: str):
         active_clients[stream_name] = []
 
     # Add the WebSocket connection to the active clients for this stream
+    print(f"Adding websocket to ffmpeg process for {stream_name}")
     active_clients[stream_name].append(websocket)
 
     try:
