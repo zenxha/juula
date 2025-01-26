@@ -22,7 +22,7 @@ const Home = () => {
     const videoElement = videoRef.current;
     if (videoElement && Hls.isSupported()) {
       const hls = new Hls();
-      hls.loadSource('http://luong.utako.moe/spaceshower/index.m3u8'); // Replace with your m3u8 stream URL
+      hls.loadSource('https://luong.utako.moe/spaceshower/index.m3u8'); // Replace with your m3u8 stream URL
       hls.attachMedia(videoElement);
 
       return () => {
