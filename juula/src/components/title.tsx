@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Just_Me_Again_Down_Here } from "next/font/google";
-import { Heading, Highlight, Box  } from "@chakra-ui/react";
+// import { Heading, Highlight, Box  } from "@chakra-ui/react";
 
 // Import the font
 const justMeAgainFont = Just_Me_Again_Down_Here({
@@ -12,13 +12,12 @@ const justMeAgainFont = Just_Me_Again_Down_Here({
 const Title: React.FC = () => {
   return (
 
-    <Box as="span" px="4" py="2">
-      <Heading className={justMeAgainFont.className} color="purple.500" fontSize="4xl" display="inline">
-          <Highlight query="Juula -" styles={{ fontSize: "6xl" }}>
-            Juula - Learn Japanese from TV
-          </Highlight>
-        </Heading> 
-    </Box>
+    <h1 className={`${justMeAgainFont.className} text-purple-500 text-4xl inline`}>
+      <span className="text-6xl">
+        Juula - 
+      </span>
+      Learn Japanese from TV
+    </h1>
   );
 };
 
