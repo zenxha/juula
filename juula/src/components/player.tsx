@@ -26,10 +26,8 @@ const Player = () => {
     // Fallback for browsers that don't support HLS.js
     
     return (
-      <div className = "w-full h-screen bg-green-300"> 
-        <AspectRatio ratio={16 / 9} w="100%">
+        <div>
           <video ref={videoRef} controls className="object-contain w-full h-auto rounded-md" />
-        </AspectRatio>
         <div className="flex justify-center items-center">
         <HStack overflowX="scroll" gap={4} mt={4}>
           {channels.map((channel) => (
@@ -45,8 +43,10 @@ const Player = () => {
           ))}
         </HStack>
         </div>
+        </div>
+
        
-      </div>
+
   );
 };
 export default Player;

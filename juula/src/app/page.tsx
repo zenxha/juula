@@ -76,20 +76,31 @@ const Home = () => {
     // </Box>
     <div className="flex h-screen">
         <div className="flex flex-col w-3/5 h-screen">
-            <div className="p-4 h-1/6 bg-white">
+            <div className="p-4 h-1/6 ">
                 <Title />
             </div>
-            <div className="flex-1 bg-red-500">
-                Stuff
+            <div className="flex-1 flex justify-center p-8">
+                <div className="flex flex-col w-full p-4 rounded-md bg-red-500">
+                    <div className="flex h-4/5 bg-blue-400">
+                        Video
+                    </div>
+                    <div className="flex h-1/5 h-16 mt-4 overflow-x-auto bg-blue-400 ">
+                    Buttons
+                    </div>
+                </div>
+
             </div>
 
         
         </div>
-        <div className="flex flex-col w-2/5 h-screen">
-            <div className="flex-1 bg-green-500">
-                Top box
+        <div className="flex flex-col w-2/5 h-screen p-8">
+            <div className="flex-1 p-4 rounded-md mt-6 bg-red-500">
+                
+                    Top box
+ 
+         
             </div>
-            <div className="flex-1 bg-blue-500">
+            <div className="flex-1 p-4 rounded-md mt-6 bg-red-500">
                 Bottom Box
             </div>
 
